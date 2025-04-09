@@ -14,6 +14,8 @@ import { format } from "date-fns"
 import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { startTransition, useActionState, useEffect, useMemo, useState } from "react"
+import { TransactionItems2 } from "./transaction-items-table"
+import { TransactionItemFormValues } from "@/forms/transaction-items"
 
 export default function TransactionEditForm({
   transaction,
@@ -34,7 +36,8 @@ export default function TransactionEditForm({
   const [deleteState, deleteAction, isDeleting] = useActionState(deleteTransactionAction, null)
   const [saveState, saveAction, isSaving] = useActionState(saveTransactionAction, null)
 
-  const extraFields = fields.filter((field) => field.isExtra)
+  const extraFields = fields.filter((field) => field.isExtra)// && field.code != "items")
+  
   const [formData, setFormData] = useState({
     name: transaction.name || "",
     merchant: transaction.merchant || "",
@@ -48,7 +51,7 @@ export default function TransactionEditForm({
     projectCode: transaction.projectCode || settings.default_project,
     issuedAt: transaction.issuedAt ? format(transaction.issuedAt, "yyyy-MM-dd") : "",
     note: transaction.note || "",
-    //items: transaction.items || [],
+    //items: transaction.extra?.["items"] || [],
     ...extraFields.reduce((acc, field) => {
       acc[field.code] = transaction.extra?.[field.code as keyof typeof transaction.extra] || ""
       return acc
@@ -157,6 +160,7 @@ export default function TransactionEditForm({
 
       <FormTextarea title={fieldMap.note.name} name="note" defaultValue={formData.note} className="h-24" />
       {extraFields.map((field) => (
+        field.code != "items" ?
         <FormInput
           key={field.code}
           type="text"
@@ -164,6 +168,9 @@ export default function TransactionEditForm({
           name={field.code}
           defaultValue={formData[field.code as keyof typeof formData] || ""}
         />
+        : <TransactionItems2
+            items={formData[field.code as keyof typeof formData] as unknown as TransactionItemFormValues[]}
+          />
       ))}
 
       <div className="flex justify-between space-x-4 pt-6">

@@ -8,14 +8,14 @@ const transactionItems = {
       properties: {
           name: { type: "string" },
           // description: { type: "string" },
-          // subCategory: { type: "string" },
-          // quantity: { type: "number" },          
-          // unit: { type: "string" },
+           subCategory: { type: "string" },
+           quantity: { type: "number" },          
+           unit: { type: "string" },
           // unitPrice: { type: "number" },
           total: { type: "number" },
   
       },
-      required: ["name", "total"],
+      required: ["name", "subCategory", "quantity", "unit", "total"],
       additionalProperties: false,
      // description: "Array of transaction items",
   }
@@ -39,7 +39,6 @@ export const fieldsToJsonSchema = (fields: Field[]) => {
   delete schema.properties["items"]
 
   schema.properties["items"] = transactionItems
-  // schema.required.pop()
-  // schema.required.push("transactionitems")
+  
   return schema
 }

@@ -65,7 +65,21 @@ export async function saveFileAsTransactionAction(
 ): Promise<ActionState<Transaction>> {
   try {
     const user = await getCurrentUser()
-    const validatedForm = transactionFormSchema.safeParse(Object.fromEntries(formData.entries()))
+    
+    const parsedFormData = {
+      ...Object.fromEntries(formData.entries()),
+      items: formData.get('items') 
+        ? (typeof formData.get('items') === 'string' 
+          ? JSON.parse(formData.get('items') as string) 
+          : formData.get('items'))
+        : []
+    }
+
+    console.log("Saving file as transaction...", parsedFormData)
+    
+    const validatedForm = transactionFormSchema.safeParse(parsedFormData)
+
+    console.log("Validated form data:", validatedForm)
 
     if (!validatedForm.success) {
       return { success: false, error: validatedForm.error.message }

@@ -26,13 +26,14 @@ export const transactionItemFormSchema = z.object({
     })
     .optional(),
   total: z
-    .string()
+  .number()
+    //.string()
     .transform((val) => {
-      const num = parseFloat(val)
-      if (isNaN(num)) {
+      //const num = parseFloat(val)
+      if (isNaN(val)) {
         throw new z.ZodError([{ message: "Invalid total", path: ["total"], code: z.ZodIssueCode.custom }])
       }
-      return Math.round(num * 100) // convert to cents
+      return Math.round(val * 100) // convert to cents
     })
     .optional(),
 })

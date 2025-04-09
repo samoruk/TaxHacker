@@ -49,7 +49,7 @@ export default function AnalyzeForm({
     )
   }, [fields])
 
-  const extraFields = useMemo(() => fields.filter((field) => field.isExtra), [fields])
+  const extraFields = useMemo(() => fields.filter((field) => field.isExtra && field.name != 'items'), [fields])
   const initialFormState = useMemo(
     () => ({
       name: file.filename,
@@ -65,6 +65,7 @@ export default function AnalyzeForm({
       issuedAt: "",
       note: "",
       text: "",
+      items: "",
       ...extraFields.reduce(
         (acc, field) => {
           acc[field.code] = ""
@@ -100,7 +101,7 @@ export default function AnalyzeForm({
       setAnalyzeStep("Analyzing...")
       const results = await analyzeFileAction(file, settings, fields, categories, projects)
 
-      console.log("Analysis results:", results)
+      //console.log("Analysis results:", results?.data?.items)
 
       if (!results.success) {
         setAnalyzeError(results.error ? results.error : "Something went wrong...")
@@ -110,6 +111,8 @@ export default function AnalyzeForm({
             ([_, value]) => value !== null && value !== undefined && value !== ""
           )
         )
+        nonEmptyFields["items"] = JSON.stringify(results.data?.items || [])
+        console.log("Non-empty fields:", nonEmptyFields)
         setFormData({ ...formData, ...nonEmptyFields })
       }
     } catch (error) {
