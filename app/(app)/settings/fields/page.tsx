@@ -29,7 +29,7 @@ export default async function FieldsSettingsPage() {
             key: "type",
             label: "Type",
             type: "select",
-            options: ["string", "number", "boolean"],
+            options: ["string", "number", "boolean", "array", "object"],
             defaultValue: "string",
             editable: true,
           },

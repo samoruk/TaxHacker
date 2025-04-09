@@ -165,12 +165,12 @@ model Transaction {
   description           String?
   merchant              String?
   total                 Int?
-  currencyCode          String?   @map("currency_code")
-  convertedTotal        Int?      @map("converted_total")
-  convertedCurrencyCode String?   @map("converted_currency_code")
-  type                  String?   @default("expense")
+  currencyCode          String?          @map("currency_code")
+  convertedTotal        Int?             @map("converted_total")
+  convertedCurrencyCode String?          @map("converted_currency_code")
+  type                  String?          @default("expense")
   note                  String?
-  files                 Json      @default("[]")
+  files                 Json             @default("[]")
   extra                 Json?
   category              Category? @relation(fields: [categoryCode, userId], references: [code, userId])
   categoryCode          String?   @map("category_code")
@@ -180,6 +180,7 @@ model Transaction {
   createdAt             DateTime  @default(now()) @map("created_at")
   updatedAt             DateTime  @updatedAt @map("updated_at")
   text                  String?
+  items                 TransactionItem[]
 
   @@index([userId])
   @@index([projectCode])
@@ -200,4 +201,22 @@ model Currency {
 
   @@unique([userId, code])
   @@map("currencies")
+}
+
+model TransactionItem {
+  id              String      @id @default(uuid())
+  name            String
+  description     String?
+  subCategory     String?     @map("sub_category")
+  quantity        Float       @default(1)
+  unit            String?
+  unitPrice       Int?        @map("unit_price")
+  total           Int?
+  transaction     Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  transactionId   String      @map("transaction_id") @db.Uuid
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  
+  @@index([transactionId])
+  @@map("transactionitems")
 }

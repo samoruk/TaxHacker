@@ -7,6 +7,7 @@ import { FormSelectCurrency } from "@/components/forms/select-currency"
 import { FormSelectProject } from "@/components/forms/select-project"
 import { FormSelectType } from "@/components/forms/select-type"
 import { FormInput, FormTextarea } from "@/components/forms/simple"
+import { TransactionItems } from "./transaction-items"
 import { Button } from "@/components/ui/button"
 import { Category, Currency, Field, Project, Transaction } from "@prisma/client"
 import { format } from "date-fns"
@@ -47,13 +48,11 @@ export default function TransactionEditForm({
     projectCode: transaction.projectCode || settings.default_project,
     issuedAt: transaction.issuedAt ? format(transaction.issuedAt, "yyyy-MM-dd") : "",
     note: transaction.note || "",
-    ...extraFields.reduce(
-      (acc, field) => {
-        acc[field.code] = transaction.extra?.[field.code as keyof typeof transaction.extra] || ""
-        return acc
-      },
-      {} as Record<string, any>
-    ),
+    //items: transaction.items || [],
+    ...extraFields.reduce((acc, field) => {
+      acc[field.code] = transaction.extra?.[field.code as keyof typeof transaction.extra] || ""
+      return acc
+    }, {} as Record<string, any>),
   })
 
   const fieldMap = useMemo(() => {

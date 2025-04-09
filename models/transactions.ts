@@ -3,6 +3,7 @@ import { Field, Prisma, Transaction } from "@prisma/client"
 import { cache } from "react"
 import { getFields } from "./fields"
 import { deleteFile } from "./files"
+import { createTransactionItem } from "./transaction-items"
 
 export type TransactionData = {
   [key: string]: unknown
@@ -101,6 +102,7 @@ export const getTransactionById = cache(async (id: string, userId: string): Prom
     include: {
       category: true,
       project: true,
+      items: true,
     },
   })
 })
@@ -108,23 +110,45 @@ export const getTransactionById = cache(async (id: string, userId: string): Prom
 export const createTransaction = async (userId: string, data: TransactionData): Promise<Transaction> => {
   const { standard, extra } = await splitTransactionDataExtraFields(data, userId)
 
+  const items = data.items as any[] || []
+  console.log("Items", JSON.stringify(items))
+  const transactionItems = items.map((item) =>  ({name: item.name, description: item.description, subCategory: item.subCategory, quantity: item.quantity, unit: item.unit, unitPrice: item.unitPrice, total: item.total}))
+
   return await prisma.transaction.create({
     data: {
       ...standard,
       extra: extra,
       userId,
+      items: {
+        create: transactionItems,
+      },
+    },
+    include: {
+      items: true,
     },
   })
 }
 
 export const updateTransaction = async (id: string, userId: string, data: TransactionData): Promise<Transaction> => {
   const { standard, extra } = await splitTransactionDataExtraFields(data, userId)
+  const items = data.items as any[] || []
+  
+  // First delete existing items (if any), then create new ones
+  await prisma.transactionItem.deleteMany({
+    where: { transactionId: id }
+  })
 
   return await prisma.transaction.update({
     where: { id, userId },
     data: {
       ...standard,
       extra: extra,
+      items: {
+        create: items,
+      },
+    },
+    include: {
+      items: true,
     },
   })
 }
@@ -146,6 +170,7 @@ export const deleteTransaction = async (id: string, userId: string): Promise<Tra
       await deleteFile(fileId, userId)
     }
 
+    // Transaction items will be deleted automatically due to ON DELETE CASCADE
     return await prisma.transaction.delete({
       where: { id, userId },
     })

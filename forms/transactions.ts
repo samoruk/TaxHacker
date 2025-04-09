@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { transactionItemFormSchema } from "./transaction-items"
+
 export const transactionFormSchema = z
   .object({
     name: z.string().max(128).optional(),
@@ -45,5 +47,7 @@ export const transactionFormSchema = z
       .optional(),
     text: z.string().optional(),
     note: z.string().optional(),
+    items: z.array(transactionItemFormSchema).optional(),
+    //items: z.string().optional(),
   })
   .catchall(z.string())

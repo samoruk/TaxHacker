@@ -164,6 +164,23 @@ CREATE TABLE "currencies" (
     CONSTRAINT "currencies_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "transaction_items" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "sub_category" TEXT,
+    "quantity" DOUBLE PRECISION NOT NULL DEFAULT 1,
+    "unit" TEXT,
+    "unit_price" INTEGER,
+    "total" INTEGER,
+    "transaction_id" UUID NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "transaction_items_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -206,6 +223,9 @@ CREATE INDEX "transactions_total_idx" ON "transactions"("total");
 -- CreateIndex
 CREATE UNIQUE INDEX "currencies_user_id_code_key" ON "currencies"("user_id", "code");
 
+-- CreateIndex
+CREATE INDEX "transaction_items_transaction_id_idx" ON "transaction_items"("transaction_id");
+
 -- AddForeignKey
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -238,3 +258,6 @@ ALTER TABLE "transactions" ADD CONSTRAINT "transactions_project_code_user_id_fke
 
 -- AddForeignKey
 ALTER TABLE "currencies" ADD CONSTRAINT "currencies_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "transaction_items" ADD CONSTRAINT "transaction_items_transaction_id_fkey" FOREIGN KEY ("transaction_id") REFERENCES "transactions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
